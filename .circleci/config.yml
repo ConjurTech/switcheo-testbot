@@ -36,3 +36,14 @@ workflows:
     jobs:
       - test:
           context: org-switcheo
+
+  # testbot:
+  #     triggers:
+  #       - schedule:
+  #           cron: "0 * * * *"
+  #           filters:
+  #             branches:
+  #               only: master
+  #     jobs:
+  #       - test:
+  #           context: org-switcheo

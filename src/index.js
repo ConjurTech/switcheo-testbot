@@ -1,36 +1,53 @@
 import { Switcheo } from 'switcheo-js'
-import { toNeoAssetAmount } from './utils'
-import { listOrders, createOrders, filterOpenOrders, cancelAllOpenOrders } from './lib/orders'
+import { cloneDeep } from 'lodash'
+import { actPrinter } from './utils'
+import * as act from './lib'
+import config from './config'
+import localConfig from './.config.local'
 
-// Load dotenv
+// NOTE: This must be placed as high up as possible
+// Load .dot file as environment variables
 require('dotenv').config()
 
-// Main Method
-const run = async () => {
+const { wallets, bot } = process.env.LOCAL ? localConfig : config
+
+const enabledCommands = c => c.run
+
+const initialise = () => {
   const switcheo = new Switcheo({
     net: 'TestNet',
     blockchain: 'neo',
   })
 
-
-  console.log(process.env)
-
-  const account = switcheo.createAccount({ privateKey: process.env.USER_1_PRIVATE_KEY })
-
-  const orderParams = {
-    pair: 'SWTH_NEO',
-    blockchain: 'neo',
-    side: 'buy',
-    price: (0.00060008).toFixed(8),
-    wantAmount: toNeoAssetAmount(16.83108918),
-    useNativeTokens: true,
-    orderType: 'limit',
+  const privateKey1 = wallets[0]
+  if (!process.env[privateKey1]) {
+    throw new Error('No private key found. See README.md')
   }
+  const account = switcheo.createAccount({ privateKey: process.env[privateKey1] })
 
-  // console.log(await listOrders(switcheo, account))
+  return [switcheo, account]
+}
 
-  createOrders(switcheo, account, orderParams, { numOfOrders: 2, cancelImmediately: false })
-  // console.log(await cancelAllOpenOrders(switcheo, account))
+const runSingle = async (switcheo, account, commands) => {
+  commands.filter(enabledCommands).forEach(async (command) => {
+    const { type, action, params = [], options = {} } = cloneDeep(command)
+    const res = await act[type][action]({ switcheo, account }, ...params, options)
+    if (options && options.print) {
+      actPrinter(type, action, options, res)
+    }
+  })
+}
+
+// Main Method
+const run = async () => {
+  const [switcheo, account] = initialise()
+
+  const shouldRunSingleCommand = bot && bot.single && bot.single.run
+  if (shouldRunSingleCommand) {
+    runSingle(switcheo, account, bot.single.commands)
+  } else {
+    // run bot
+  }
 }
 
 run()

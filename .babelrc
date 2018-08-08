@@ -1,4 +1,6 @@
 {
+  "sourceMaps": "inline",
+  "plugins": ["source-map-support"],
   "presets": [["env", {
     "targets": {
       "node": "current",

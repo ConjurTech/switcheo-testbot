@@ -1,4 +1,4 @@
-const { BigNumber } = require('bignumber.js')
+import { BigNumber } from 'bignumber.js'
 
 const NEO_ASSET_PRECISION = 8
 
@@ -22,3 +22,5 @@ export const linePrint = (res) => {
   // eslint-disable-next-line no-console
   console.log(`--- ${res} ---`)
 }
+
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

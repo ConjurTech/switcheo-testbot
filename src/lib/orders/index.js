@@ -1,26 +1,42 @@
-import { sortOrdersByCreatedAt } from './helper'
-import { filterOpenOrders } from './filters'
-import { toNeoAssetAmount, linePrint } from '../../utils'
+const { sortOrdersByCreatedAt } = require('./helper')
+const filters = require('./filters')
+const { toNeoAssetAmount, linePrint } = require('../../utils')
 
-export * from './filters'
+const { filterOpenOrders } = filters
 
 const list = async ({ switcheo, account }) => {
   const orders = await switcheo.listOrders({ address: account.scriptHash, pair: 'SWTH_NEO' })
   return sortOrdersByCreatedAt(orders)
 }
 
-const create = ({ switcheo, account }, orderParams, { num = 1, cancelImmediately = false }) => {
+const create = async ({ switcheo, account }, orderParams, { num = 1, cancelImmediately = false }) => {
   orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
   orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
-  for (let i = 0; i < num; i++) {
-    switcheo.createOrder(orderParams, account).then(order => {
-      linePrint(`order created: ${order.id}`)
+  const promises = []
 
-      if (cancelImmediately) {
-        cancelOrder(switcheo, account, order.id).then(res => linePrint(`order canceled: ${res.id}`))
+  for (let i = 0; i < num; i++) {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        let order = await switcheo.createOrder(orderParams, account)
+        linePrint(`order created: ${order.id}`)
+
+        if (cancelImmediately) {
+          // eslint-disable-next-line no-await-in-loop
+          order = await cancelOrder(switcheo, account, order.id)
+          linePrint(`order canceled: ${order.id}`)
+        }
+
+        resolve(order)
+      } catch (err) {
+        reject(err)
       }
     })
+    promises.push(promise)
   }
+
+  const res = await Promise.all(promises)
+  return res
 }
 
 const cancelOrder = (switcheo, account, orderId) =>
@@ -38,8 +54,9 @@ const cancelAllOpenOrders = async ({ switcheo, account }) => {
 }
 
 // act.orders.*
-export {
+module.exports = {
+  ...filters,
   list,
   create,
-  cancelAllOpenOrders as cancelAllOpen,
+  cancelAllOpen: cancelAllOpenOrders,
 }

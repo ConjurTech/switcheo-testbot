@@ -1,52 +1,62 @@
 import { Switcheo } from 'switcheo-js'
-import { cloneDeep } from 'lodash'
-import { actPrinter } from './utils'
-import * as act from './lib'
-import config from './config'
-import localConfig from './.config.local'
+import { some } from 'lodash'
+import _config from './config'
+import _localConfig from './.config.local'
+import runSingle from './runSingle'
+import runLoop from './runLoop'
 
 // NOTE: This must be placed as high up as possible
 // Load .dot file as environment variables
 require('dotenv').config()
 
-const { wallets, bot } = process.env.LOCAL ? localConfig : config
+const config = process.env.LOCAL ? _localConfig : _config
 
-const enabledCommands = c => c.run
+const checkPrivateKeys = (wallets) => {
+  const someMissingKeys = some(wallets, (wallet) => !process.env[wallet])
+  if (someMissingKeys) throw new Error('Some private key not found. See README.md')
+}
+const checkWalletLength = (wallets, length) => {
+  if (wallets.length < length) throw new Error(`Need at least ${length} wallets. See README.md`)
+}
 
-const initialise = () => {
+const initialise = ({ isSingleRun }) => {
+  const { wallets } = config
   const switcheo = new Switcheo({
     net: 'TestNet',
     blockchain: 'neo',
   })
 
-  const privateKey1 = wallets[0]
-  if (!process.env[privateKey1]) {
-    throw new Error('No private key found. See README.md')
+  if (isSingleRun) {
+    checkPrivateKeys(wallets)
+    checkWalletLength(wallets, 1)
+
+    const account = switcheo.createAccount({ privateKey: process.env[wallets[0]] })
+
+    return [switcheo, [account]]
   }
-  const account = switcheo.createAccount({ privateKey: process.env[privateKey1] })
 
-  return [switcheo, account]
-}
+  checkPrivateKeys(wallets)
+  checkWalletLength(wallets, 2)
 
-const runSingle = async (switcheo, account, commands) => {
-  commands.filter(enabledCommands).forEach(async (command) => {
-    const { type, action, params = [], options = {} } = cloneDeep(command)
-    const res = await act[type][action]({ switcheo, account }, ...params, options)
-    if (options && options.print) {
-      actPrinter(type, action, options, res)
-    }
-  })
+  const accounts = wallets.map(wallet => switcheo.createAccount({ privateKey: process.env[wallet] }))
+  return [switcheo, accounts]
 }
 
 // Main Method
-const run = async () => {
-  const [switcheo, account] = initialise()
+const run = () => {
+  const { bot } = config
 
-  const shouldRunSingleCommand = bot && bot.single && bot.single.run
-  if (shouldRunSingleCommand) {
-    runSingle(switcheo, account, bot.single.commands)
+  const isSingleRun = bot && bot.single && bot.single.run
+  const isLoopRun = bot && bot.loop && bot.loop.run
+  if (!isSingleRun && !isLoopRun) return
+
+  const [switcheo, accounts] = initialise({ isSingleRun })
+
+  if (isSingleRun) {
+    runSingle(switcheo, accounts, bot.single.commands)
   } else {
     // run bot
+    runLoop(switcheo, accounts, bot.loop.config)
   }
 }
 

@@ -1,42 +1,39 @@
-const { sortOrdersByCreatedAt } = require('./helper')
-const filters = require('./filters')
-const { toNeoAssetAmount, linePrint } = require('../../utils')
+import { sortOrdersByCreatedAt, deferredCreate, printCreatedOrders } from './helper'
+import { filterOpenOrders } from './filters'
+import { toNeoAssetAmount, linePrint } from '../../utils'
 
-const { filterOpenOrders } = filters
+export * from './filters'
 
 const list = async ({ switcheo, account }) => {
   const orders = await switcheo.listOrders({ address: account.scriptHash, pair: 'SWTH_NEO' })
   return sortOrdersByCreatedAt(orders)
 }
 
-const create = async ({ switcheo, account }, orderParams, { num = 1, cancelImmediately = false }) => {
+const create = async ({ switcheo, account }, orderParams,
+  { num = 1, parallel = false }) => {
   orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
   orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
-  const promises = []
+  const deferredPromises = []
+  let orders = []
 
   for (let i = 0; i < num; i++) {
-    const promise = new Promise(async (resolve, reject) => {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        let order = await switcheo.createOrder(orderParams, account)
-        linePrint(`order created: ${order.id}`)
-
-        if (cancelImmediately) {
-          // eslint-disable-next-line no-await-in-loop
-          order = await cancelOrder(switcheo, account, order.id)
-          linePrint(`order canceled: ${order.id}`)
-        }
-
-        resolve(order)
-      } catch (err) {
-        reject(err)
-      }
-    })
-    promises.push(promise)
+    deferredPromises.push(deferredCreate.bind(null, switcheo, account, orderParams))
   }
 
-  const res = await Promise.all(promises)
-  return res
+  if (parallel) {
+    const promises = deferredPromises.map(p => p())
+    orders = await Promise.all(promises)
+    printCreatedOrders(orders)
+  } else {
+    for (let i = 0; i < deferredPromises.length; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      const order = await deferredPromises[i]()
+      printCreatedOrders(orders)
+      orders.push(order)
+    }
+  }
+
+  return orders
 }
 
 const cancelOrder = (switcheo, account, orderId) =>
@@ -54,9 +51,8 @@ const cancelAllOpenOrders = async ({ switcheo, account }) => {
 }
 
 // act.orders.*
-module.exports = {
-  ...filters,
+export {
   list,
   create,
-  cancelAllOpen: cancelAllOpenOrders,
+  cancelAllOpenOrders as cancelAllOpen,
 }

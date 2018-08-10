@@ -28,7 +28,7 @@ const runLoop = async (switcheo, accounts, config, flipCreateParams = false) => 
   const createOrdersBuy = orders.create.buyParams
   const createOrdersSell = orders.create.sellParams
 
-  const createOrderOptions = { cancelImmediately: false, num: 1 }
+  const createOrderOptions = { num: 2 }
 
   res = await createOrder({ switcheo, account: accounts[0] },
     ...createOrderParams('buy', flipCreateParams, createOrdersBuy, createOrdersSell), createOrderOptions)

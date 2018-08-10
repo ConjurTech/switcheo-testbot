@@ -48,7 +48,6 @@ Sample configs:
             }
           ],
           "options": {
-            "cancelImmediately": false,
             "num": 2 // loop creates
           }
         },

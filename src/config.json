@@ -28,7 +28,6 @@
             }
           ],
           "options": {
-            "cancelImmediately": false,
             "num": 2
           }
         },

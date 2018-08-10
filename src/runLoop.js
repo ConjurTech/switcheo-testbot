@@ -41,7 +41,7 @@ const runLoop = async (switcheo, accounts, config, flipCreateParams = false) => 
   await sleep(100)
 
   await sleep(interval)
-  runLoop(switcheo, accounts, config, !flipCreateParams)
+  await runLoop(switcheo, accounts, config, !flipCreateParams)
 }
 
 export default runLoop

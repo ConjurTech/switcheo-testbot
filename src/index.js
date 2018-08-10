@@ -1,4 +1,5 @@
 import { Switcheo } from 'switcheo-js'
+import bluebird from 'bluebird'
 import { some } from 'lodash'
 import _config from './config'
 import _localConfig from './.config.local'
@@ -8,6 +9,8 @@ import runLoop from './runLoop'
 // NOTE: This must be placed as high up as possible
 // Load .dot file as environment variables
 require('dotenv').config()
+
+global.Promise = bluebird
 
 const config = process.env.LOCAL ? _localConfig : _config
 
@@ -43,7 +46,7 @@ const initialise = ({ isSingleRun }) => {
 }
 
 // Main Method
-const run = () => {
+const run = async () => {
   const { bot } = config
 
   const isSingleRun = bot && bot.single && bot.single.run
@@ -52,11 +55,16 @@ const run = () => {
 
   const [switcheo, accounts] = initialise({ isSingleRun })
 
-  if (isSingleRun) {
-    runSingle(switcheo, accounts, bot.single.commands)
-  } else {
-    // run bot
-    runLoop(switcheo, accounts, bot.loop.config)
+  try {
+    if (isSingleRun) {
+      await runSingle(switcheo, accounts, bot.single.commands)
+    } else {
+      // run bot
+      await runLoop(switcheo, accounts, bot.loop.config)
+    }
+  } catch (err) {
+    console.error(err)
+    throw new Error(err)
   }
 }
 

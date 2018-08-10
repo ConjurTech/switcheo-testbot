@@ -60,7 +60,8 @@ const run = async () => {
       await runSingle(switcheo, accounts, bot.single.commands)
     } else {
       // run bot
-      await runLoop(switcheo, accounts, bot.loop.config)
+      const runnerConfig = {}
+      await runLoop(switcheo, accounts, bot.loop.config, runnerConfig)
     }
   } catch (err) {
     console.error(err)

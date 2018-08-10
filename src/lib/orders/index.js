@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import { sortOrdersByCreatedAt, deferredCreate, printCreatedOrders } from './helper'
 import { filterOpenOrders } from './filters'
 import { toNeoAssetAmount, linePrint } from '../../utils'
@@ -9,15 +10,38 @@ const list = async ({ switcheo, account }) => {
   return sortOrdersByCreatedAt(orders)
 }
 
+const makeCreateParams = (_params, { i, length, priceSteps }) => {
+  let params
+  let price = new BigNumber(_params.price)
+
+  if (_params.side === 'buy') {
+    price = price.plus(priceSteps * i).toFixed(8, BigNumber.ROUND_DOWN)
+    const offerAmount = new BigNumber(_params.offerAmount)
+    const wantAmount = offerAmount.div(price).toFixed(8, BigNumber.ROUND_DOWN)
+
+    params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
+  } else {
+    price = price.plus(priceSteps * (length - 1 - i)).toFixed(8, BigNumber.ROUND_DOWN)
+    const wantAmount = new BigNumber(_params.wantAmount)
+
+    params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
+  }
+
+  delete params.offerAmount
+
+  return params
+}
+
 const create = async ({ switcheo, account }, orderParams,
-  { num = 1, parallel = false }) => {
-  orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
-  orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
+  { num = 1, priceSteps = 0, parallel = false }) => {
+  // orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
+  // orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
   const deferredPromises = []
   let orders = []
 
   for (let i = 0; i < num; i++) {
-    deferredPromises.push(deferredCreate.bind(null, switcheo, account, orderParams))
+    deferredPromises.push(deferredCreate.bind(null, switcheo, account,
+      makeCreateParams(orderParams, { i, length: num, priceSteps })))
   }
 
   if (parallel) {

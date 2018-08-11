@@ -26,8 +26,14 @@ const printOrders = (account, orders) => {
   })
 }
 
-const createOrderParams = (side, flip, buyParams, sellParams) =>
-  ((side === 'buy' && !flip) || (side === 'sell' && flip) ? buyParams : sellParams)
+// Set sellParams price to match
+const createOrderParams = (side, flip, buyParams, sellParams, { num, priceSteps }) => {
+  if (priceSteps) {
+    // eslint-disable-next-line no-param-reassign
+    sellParams[0].price = buyParams[0].price + (num - 1) * priceSteps
+  }
+  return ((side === 'buy' && !flip) || (side === 'sell' && flip) ? buyParams : sellParams)
+}
 
 // Main logic for bot
 const runLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
@@ -44,7 +50,6 @@ const runLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
 
     if (!hasClearedInitialOpenOrders) await clearOpenOrdersForAccounts(switcheo, accounts)
 
-
     // res = await createOrder({ switcheo, account: accounts[0] },
     //   ...createOrderParams('buy', flipCreateParams, createOrdersBuy, createOrdersSell), createOrderOptions)
     // printOrders(account, res)
@@ -57,12 +62,13 @@ const runLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
 
 
     res = await createOrder({ switcheo, account: accounts[0] },
-      ...createOrderParams('buy', flipCreateParams, createOrdersBuy, createOrdersSell),
+      ...createOrderParams('buy', flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions),
       { ...createOrderOptions, parallel: true }) // ideally, this account will always do makes
     printOrders(accounts[0], res)
 
     res = await createOrder({ switcheo, account: accounts[1] },
-      ...createOrderParams('sell', flipCreateParams, createOrdersBuy, createOrdersSell), createOrderOptions)
+      ...createOrderParams('sell', flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions),
+      createOrderOptions)
     printOrders(accounts[1], res) // ideally, this account will always do fills
   } catch (err) {
     const invalidSigMessage = 'Invalid signature'

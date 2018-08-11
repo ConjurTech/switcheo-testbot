@@ -10,18 +10,20 @@ const list = async ({ switcheo, account }) => {
   return sortOrdersByCreatedAt(orders)
 }
 
-const makeCreateParams = (_params, { i, length, priceSteps }) => {
+const makeCreateParams = (_params, priceSteps) => {
   let params
   let price = new BigNumber(_params.price)
 
   if (_params.side === 'buy') {
-    price = price.plus(priceSteps * i).toFixed(8, BigNumber.ROUND_DOWN)
+    // buy cheap first, then increase buy price in steps
+    price = price.plus(priceSteps).toFixed(8, BigNumber.ROUND_DOWN)
     const offerAmount = new BigNumber(_params.offerAmount)
     const wantAmount = offerAmount.div(price).toFixed(8, BigNumber.ROUND_DOWN)
 
     params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
   } else {
-    price = price.plus(priceSteps * (length - 1 - i)).toFixed(8, BigNumber.ROUND_DOWN)
+    // sell expensive first, then decrease buy price in steps
+    price = price.minus(priceSteps).toFixed(8, BigNumber.ROUND_DOWN)
     const wantAmount = new BigNumber(_params.wantAmount)
 
     params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
@@ -41,7 +43,7 @@ const create = async ({ switcheo, account }, orderParams,
 
   for (let i = 0; i < num; i++) {
     deferredPromises.push(deferredCreate.bind(null, switcheo, account,
-      makeCreateParams(orderParams, { i, length: num, priceSteps })))
+      makeCreateParams(orderParams, priceSteps * i)))
   }
 
   if (parallel) {

@@ -44,11 +44,11 @@
       "run": true,
       "config": {
         "interval": 1,
-        "raceLength": 1,
-        "randomLength": 1,
+        "raceLength": 4,
+        "randomLength": 100,
         "orders": {
           "create": {
-            "num": 1,
+            "num": 5,
             "priceSteps": 0.00000001,
             "priceRange": 0.00001000,
             "amountRange": 0.01,

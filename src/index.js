@@ -1,8 +1,6 @@
 import { Switcheo } from 'switcheo-js'
 import bluebird from 'bluebird'
 import { some } from 'lodash'
-import _config from './config'
-import _localConfig from './.config.local'
 import runSingleTest from './runSingleTest'
 import runLoopTest from './runLoopTest'
 import runBalanceCheck from './runBalanceCheck'
@@ -18,7 +16,8 @@ const checkWalletLength = (wallets, length) => {
   if (wallets.length < length) throw new Error(`Need at least ${length} wallets. See README.md`)
 }
 
-const getConfig = (env) => (env.LOCAL ? _localConfig : _config)
+// eslint-disable-next-line global-require
+const getConfig = (env) => (env.LOCAL ? require('./.config.local') : require('./config'))
 
 const initialise = (env, { minAccounts = 1 }) => {
   const { wallets } = getConfig(env)

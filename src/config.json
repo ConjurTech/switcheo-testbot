@@ -1,11 +1,11 @@
 {
-  "wallets": ["WALLET_1"],
+  "wallets": ["WALLET_1", "WALLET_2"],
   "bot": {
     "single": {
-      "run": true,
+      "run": false,
       "commands": [
         {
-          "run": false,
+          "run": true,
           "type": "orders",
           "action": "list",
           "options": {
@@ -18,16 +18,18 @@
           "action": "create",
           "params": [
             {
-              "pair": "SWTH_NEO",
               "blockchain": "neo",
+              "pair": "SWTH_NEO",
               "side": "buy",
-              "price": 0.00060008,
-              "wantAmount": 16.83108918,
+              "price": 0.00070008,
+              "wantAmount": 14.42692264,
               "useNativeTokens": true,
-              "orderType": "limit"
+              "orderType": "limit",
+              "offerAmount": 0.01010000
             }
           ],
           "options": {
+            "cancelImmediately": false,
             "num": 2
           }
         },
@@ -37,6 +39,46 @@
           "action": "cancelAllOpen"
         }
       ]
+    },
+    "loop": {
+      "run": true,
+      "config": {
+        "interval": 1,
+        "raceLength": 4,
+        "randomLength": 10,
+        "orders": {
+          "create": {
+            "num": 5,
+            "priceSteps": 0.00000001,
+            "priceRange": 0.00001000,
+            "amountRange": 0.02,
+            "buyParams": [
+              {
+                "blockchain": "neo",
+                "pair": "SWTH_NEO",
+                "side": "buy",
+                "price": 0.00070008,
+                "wantAmount": 14.42692264,
+                "useNativeTokens": true,
+                "orderType": "limit",
+                "offerAmount": 0.01010000
+              }
+            ],
+            "sellParams": [
+              {
+                "blockchain": "neo",
+                "pair": "SWTH_NEO",
+                "side": "sell",
+                "price": 0.00070008,
+                "wantAmount": 0.01010000,
+                "useNativeTokens": true,
+                "orderType": "limit",
+                "offerAmount": 14.42692264
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }

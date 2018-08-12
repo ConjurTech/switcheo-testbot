@@ -1,3 +1,4 @@
 import * as orders from './orders'
+import * as errors from './errors'
 
-export { orders }
+export { errors, orders }

@@ -5,6 +5,9 @@
 - Run `npm start`.
 - Optionally, without .env, you can run with `WALLET_1=WIF npm start`.
 
+## Buidling
+- Run `npm run build`, to ensure that node.js could use this package natively. package.json points to build.
+
 ## Bot Config
 
 To run bot locally, add `LOCAL=true` to `.env` and create `src/.config.local.json`.

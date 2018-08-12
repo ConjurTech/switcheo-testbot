@@ -26,7 +26,7 @@ const initialise = (env, { minAccounts = 1 }) => {
     blockchain: 'neo',
   })
 
-  checkPrivateKeys(wallets)
+  checkPrivateKeys(env, wallets)
   checkWalletLength(wallets, minAccounts)
   const accounts = wallets.map(wallet => switcheo.createAccount({ privateKey: env[wallet] }))
 

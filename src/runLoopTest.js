@@ -27,6 +27,7 @@ const clearOpenOrdersForAccounts = async (switcheo, accounts) => {
     }
   } catch (err) {
     if (isInvalidSignatureError(err)) {
+      await sleep(500) // courtesy wait
       await clearOpenOrdersForAccounts(switcheo, accounts)
     }
     throw new Error(err)
@@ -189,6 +190,7 @@ const runRaceLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
   } catch (err) {
     // ocassionally, verify_sig function from switcheo-api fails, so we try to run again
     if (isInvalidSignatureError(err)) {
+      await sleep(500) // courtesy wait
       await runRaceLoop(switcheo, accounts, config, {
         ...runnerConfig,
         flipCreateParams, // don't flip, retry with same args again
@@ -217,7 +219,7 @@ const runRaceLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
 }
 
 // Main logic for bot
-const runLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
+const runLoopTest = async (switcheo, accounts, config, runnerConfig = {}) => {
   await clearOpenOrdersForAccounts(switcheo, accounts)
 
   await runRaceLoop(switcheo, accounts, config, runnerConfig)
@@ -226,4 +228,4 @@ const runLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
   await clearOpenOrdersForAccounts(switcheo, accounts)
 }
 
-export default runLoop
+export default runLoopTest

@@ -8,19 +8,25 @@ export const toNeoAssetAmount = (value) => {
 }
 
 export const actPrinter = (type, action, options, res) => {
-  /* eslint-disable no-console */
-  console.log(`---------------- Type: ${type} ----------------`)
-  console.log(`---------------- Action: ${action} ----------------`)
-  console.log('---------------- Options: ----------------')
-  console.log(JSON.stringify(options, null, 2))
-  console.log('---------------------------------------------')
-  console.log(res)
-  /* eslint-enable */
+  console.info(`---------------- Type: ${type} ----------------`)
+  console.info(`---------------- Action: ${action} ----------------`)
+  console.info('---------------- Options: ----------------')
+  console.info(JSON.stringify(options, null, 2))
+  console.info('---------------------------------------------')
+  console.info(res)
 }
 
 export const linePrint = (res) => {
-  // eslint-disable-next-line no-console
-  console.log(`--- ${res} ---`)
+  console.info(`--- ${res} ---`)
 }
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export const asyncErrorHandler = async (run) => {
+  try {
+    return run()
+  } catch (err) {
+    console.error(err)
+    throw new Error(err)
+  }
+}

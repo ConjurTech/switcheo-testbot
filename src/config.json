@@ -44,24 +44,24 @@
       "run": true,
       "config": {
         "interval": 1,
-        "raceLength": 4,
-        "randomLength": 10,
+        "raceLength": 1,
+        "randomLength": 1,
         "orders": {
           "create": {
-            "num": 5,
+            "num": 1,
             "priceSteps": 0.00000001,
             "priceRange": 0.00001000,
-            "amountRange": 0.02,
+            "amountRange": 0.01,
             "buyParams": [
               {
                 "blockchain": "neo",
                 "pair": "SWTH_NEO",
                 "side": "buy",
                 "price": 0.00070008,
-                "wantAmount": 14.42692264,
+                "wantAmount": 28.85384527,
                 "useNativeTokens": true,
                 "orderType": "limit",
-                "offerAmount": 0.01010000
+                "offerAmount": 0.02020000
               }
             ],
             "sellParams": [
@@ -70,10 +70,10 @@
                 "pair": "SWTH_NEO",
                 "side": "sell",
                 "price": 0.00070008,
-                "wantAmount": 0.01010000,
+                "wantAmount": 0.02020000,
                 "useNativeTokens": true,
                 "orderType": "limit",
-                "offerAmount": 14.42692264
+                "offerAmount": 28.85384527
               }
             ]
           }

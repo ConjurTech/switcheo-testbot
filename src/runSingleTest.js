@@ -4,7 +4,7 @@ import * as act from './lib'
 
 const enabledCommands = c => c.run
 
-const runSingle = async (switcheo, accounts, commands) => {
+const runSingleTest = async (switcheo, accounts, commands) => {
   const account = accounts[0]
 
   commands.filter(enabledCommands).forEach(async (command) => {
@@ -16,4 +16,4 @@ const runSingle = async (switcheo, accounts, commands) => {
   })
 }
 
-export default runSingle
+export default runSingleTest

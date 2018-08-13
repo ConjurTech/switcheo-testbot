@@ -81,6 +81,11 @@ const runChecks = env => (0, _utils.asyncErrorHandler)(_asyncToGenerator(functio
 }));
 
 exports.default = env => (0, _utils.asyncErrorHandler)(_asyncToGenerator(function* () {
-  yield runTest(env);
-  yield runChecks(env);
+  try {
+    yield runTest(env);
+    yield runChecks(env);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 }));

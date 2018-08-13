@@ -104,8 +104,9 @@ const cancelAllOpenOrders = (() => {
   var _ref3 = _asyncToGenerator(function* ({ switcheo, account }) {
     const orders = yield list({ switcheo, account });
     const openOrders = (0, _filters.filterOpenOrders)(orders);
+    const promises = cancelOrders({ switcheo, account }, openOrders);
 
-    return Promise.all(cancelOrders({ switcheo, account }, openOrders)).then(function (res) {
+    return Promise.all(promises).then(function (res) {
       return res.forEach(function (o) {
         return (0, _utils.linePrint)(`order canceled: ${o.id}`);
       });

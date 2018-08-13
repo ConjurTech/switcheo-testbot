@@ -7,7 +7,7 @@ const isInvalidSignatureError = exports.isInvalidSignatureError = err => {
   const invalidSignatureMessage = 'Invalid signature';
 
   if (err.message.includes(invalidSignatureMessage)) {
-    console.warn('INVALID SIGNATURE ERROR');
+    console.warn('INVALID_SIGNATURE_ERROR');
     return true;
   }
   return false;

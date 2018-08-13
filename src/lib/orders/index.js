@@ -71,10 +71,9 @@ const cancelOrders = ({ switcheo, account }, orders = []) =>
 const cancelAllOpenOrders = async ({ switcheo, account }) => {
   const orders = await list({ switcheo, account })
   const openOrders = filterOpenOrders(orders)
+  const promises = cancelOrders({ switcheo, account }, openOrders)
 
-  return Promise.all(cancelOrders({ switcheo, account }, openOrders)).then((res) =>
-    res.forEach(o => linePrint(`order canceled: ${o.id}`))
-  )
+  return Promise.all(promises).then(res => res.forEach(o => linePrint(`order canceled: ${o.id}`)))
 }
 
 // act.orders.*

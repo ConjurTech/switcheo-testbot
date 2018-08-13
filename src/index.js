@@ -57,6 +57,11 @@ const runChecks = (env) => asyncErrorHandler(async () => {
 })
 
 export default (env) => asyncErrorHandler(async () => {
-  await runTest(env)
-  await runChecks(env)
+  try {
+    await runTest(env)
+    await runChecks(env)
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
 })

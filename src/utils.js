@@ -4,7 +4,7 @@ const NEO_ASSET_PRECISION = 8
 
 export const toNeoAssetAmount = (value) => {
   const bigNumber = new BigNumber(value)
-  return bigNumber.times(10 ** NEO_ASSET_PRECISION).toFixed(0)
+  return bigNumber.times(10 ** NEO_ASSET_PRECISION).dp(0).toNumber()
 }
 
 export const actPrinter = (type, action, options, res) => {
@@ -21,12 +21,3 @@ export const linePrint = (res) => {
 }
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-export const asyncErrorHandler = async (run) => {
-  try {
-    return run()
-  } catch (err) {
-    console.error(err)
-    throw new Error(err)
-  }
-}

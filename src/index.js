@@ -1,12 +1,13 @@
-import { Switcheo } from 'switcheo-js'
+import Switcheo from 'switcheo-js'
 import bluebird from 'bluebird'
 import { some } from 'lodash'
 import runSingleTest from './runSingleTest'
 import runLoopTest from './runLoopTest'
 import runBalanceCheck from './runBalanceCheck'
-import { asyncErrorHandler } from './utils'
 
 global.Promise = bluebird
+// http://bluebirdjs.com/docs/api/promise.config.html
+global.Promise.config({ longStackTraces: true })
 
 const checkPrivateKeys = (env, wallets) => {
   const someMissingKeys = some(wallets, (wallet) => !env[wallet])
@@ -23,18 +24,22 @@ const initialise = (env, { minAccounts = 1 }) => {
   const { wallets } = getConfig(env)
   const switcheo = new Switcheo({
     net: 'TestNet',
-    blockchain: 'neo',
   })
 
   checkPrivateKeys(env, wallets)
   checkWalletLength(wallets, minAccounts)
-  const accounts = wallets.map(wallet => switcheo.createAccount({ privateKey: env[wallet] }))
+  const accounts = wallets.map(wallet =>
+    Switcheo.createAccount({
+      privateKey: env[wallet],
+      blockchain: 'neo',
+    })
+  )
 
   return [switcheo, accounts]
 }
 
 // Main Method
-const runTest = (env) => asyncErrorHandler(async () => {
+const runTest = async (env) => {
   const { bot } = getConfig(env)
 
   const isSingleRun = bot && bot.single && bot.single.run
@@ -49,14 +54,14 @@ const runTest = (env) => asyncErrorHandler(async () => {
     const runnerConfig = {}
     await runLoopTest(switcheo, accounts, bot.loop.config, runnerConfig)
   }
-})
+}
 
-const runChecks = (env) => asyncErrorHandler(async () => {
+const runChecks = async (env) => {
   const [switcheo, accounts] = initialise(env, { minAccounts: 1 })
   await runBalanceCheck(switcheo, accounts)
-})
+}
 
-export default (env) => asyncErrorHandler(async () => {
+export default async (env) => {
   try {
     await runTest(env)
     await runChecks(env)
@@ -64,4 +69,4 @@ export default (env) => asyncErrorHandler(async () => {
     console.error(err)
     process.exit(1)
   }
-})
+}

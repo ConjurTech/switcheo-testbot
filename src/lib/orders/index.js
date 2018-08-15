@@ -1,12 +1,12 @@
 import { BigNumber } from 'bignumber.js'
 import { sortOrdersByCreatedAt, deferredCreate, printCreatedOrders } from './helper'
 import { filterOpenOrders } from './filters'
-import { toNeoAssetAmount, linePrint } from '../../utils'
+import { linePrint } from '../../utils'
 
 export * from './filters'
 
 const list = async ({ switcheo, account }) => {
-  const orders = await switcheo.listOrders({ address: account.scriptHash, pair: 'SWTH_NEO' })
+  const orders = await switcheo.listOrders({ pair: 'SWTH_NEO' }, account)
   return sortOrdersByCreatedAt(orders)
 }
 
@@ -16,17 +16,17 @@ const makeCreateParams = (_params, priceSteps) => {
 
   if (_params.side === 'buy') {
     // buy cheap first, then increase buy price in steps
-    price = price.plus(priceSteps).toFixed(8, BigNumber.ROUND_DOWN)
+    price = price.plus(priceSteps).dp(8, BigNumber.ROUND_DOWN).toNumber()
     const offerAmount = new BigNumber(_params.offerAmount)
-    const wantAmount = offerAmount.div(price).toFixed(8, BigNumber.ROUND_DOWN)
+    const wantAmount = offerAmount.div(price).dp(8, BigNumber.ROUND_DOWN).toNumber()
 
-    params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
+    params = { ..._params, price, wantAmount }
   } else {
     // sell expensive first, then decrease buy price in steps
-    price = price.minus(priceSteps).toFixed(8, BigNumber.ROUND_DOWN)
+    price = price.minus(priceSteps).dp(8, BigNumber.ROUND_DOWN).toNumber()
     const wantAmount = new BigNumber(_params.wantAmount) // TODO: remove this
 
-    params = { ..._params, price, wantAmount: toNeoAssetAmount(wantAmount) }
+    params = { ..._params, price, wantAmount }
   }
 
   delete params.offerAmount
@@ -36,8 +36,6 @@ const makeCreateParams = (_params, priceSteps) => {
 
 const create = async ({ switcheo, account }, orderParams,
   { num = 1, priceSteps = 0, parallel = false }) => {
-  // orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
-  // orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
   const deferredPromises = []
   let orders = []
 
@@ -62,8 +60,7 @@ const create = async ({ switcheo, account }, orderParams,
   return orders
 }
 
-const cancelOrder = ({ switcheo, account }, orderId) =>
-  switcheo.cancelOrder({ orderId }, account)
+const cancelOrder = ({ switcheo, account }, orderId) => switcheo.cancelOrder({ orderId }, account)
 
 const cancelOrders = ({ switcheo, account }, orders = []) =>
   orders.map(o => cancelOrder({ switcheo, account }, o.id))

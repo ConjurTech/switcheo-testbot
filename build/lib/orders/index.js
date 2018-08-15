@@ -29,7 +29,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const list = (() => {
   var _ref = _asyncToGenerator(function* ({ switcheo, account }) {
-    const orders = yield switcheo.listOrders({ address: account.scriptHash, pair: 'SWTH_NEO' });
+    const orders = yield switcheo.listOrders({ pair: 'SWTH_NEO' }, account);
     return (0, _helper.sortOrdersByCreatedAt)(orders);
   });
 
@@ -44,17 +44,17 @@ const makeCreateParams = (_params, priceSteps) => {
 
   if (_params.side === 'buy') {
     // buy cheap first, then increase buy price in steps
-    price = price.plus(priceSteps).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+    price = price.plus(priceSteps).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
     const offerAmount = new _bignumber.BigNumber(_params.offerAmount);
-    const wantAmount = offerAmount.div(price).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+    const wantAmount = offerAmount.div(price).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
 
-    params = _extends({}, _params, { price, wantAmount: (0, _utils.toNeoAssetAmount)(wantAmount) });
+    params = _extends({}, _params, { price, wantAmount });
   } else {
     // sell expensive first, then decrease buy price in steps
-    price = price.minus(priceSteps).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+    price = price.minus(priceSteps).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
     const wantAmount = new _bignumber.BigNumber(_params.wantAmount); // TODO: remove this
 
-    params = _extends({}, _params, { price, wantAmount: (0, _utils.toNeoAssetAmount)(wantAmount) });
+    params = _extends({}, _params, { price, wantAmount });
   }
 
   delete params.offerAmount;
@@ -64,8 +64,6 @@ const makeCreateParams = (_params, priceSteps) => {
 
 const create = (() => {
   var _ref2 = _asyncToGenerator(function* ({ switcheo, account }, orderParams, { num = 1, priceSteps = 0, parallel = false }) {
-    // orderParams.price = (orderParams.price).toFixed(8) // eslint-disable-line no-param-reassign
-    // orderParams.wantAmount = toNeoAssetAmount(orderParams.wantAmount) // eslint-disable-line no-param-reassign
     const deferredPromises = [];
     let orders = [];
 

@@ -2,11 +2,11 @@
 
 - Create `.env` in project's root.
 - Add `WALLET_1=WIF` in `.env`.
-- Run `npm start`.
-- Optionally, without .env, you can run with `WALLET_1=WIF npm start`.
+- Run `yarn start`.
+- Optionally, without .env, you can run with `WALLET_1=WIF yarn start`.
 
 ## Buidling
-- Run `npm run build`, to ensure that node.js could use this package natively. package.json points to build.
+- Run `yarn build`, to ensure that node.js could use this package natively. package.json points to build.
 
 ## Bot Config
 

@@ -108,15 +108,13 @@ const runRandomLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
 
         const createOrderOptions = { num: 1 }
         const createOrdersBuy = cloneDeep(orders.create.buyParams)
-        const sellQuantity = new BigNumber(randomQuantity)
-          .times(randomPrice).toFixed(2, BigNumber.ROUND_DOWN)
 
         createOrdersBuy[0].price = randomPrice
         createOrdersBuy[0].quantity = randomQuantity
 
         const createOrdersSell = cloneDeep(orders.create.sellParams)
         createOrdersSell[0].price = randomPrice
-        createOrdersSell[0].quantity = sellQuantity
+        createOrdersSell[0].quantity = randomQuantity
 
         const promise = new Promise((resolve) => {
           const orderParams = createOrderParams(
@@ -202,6 +200,7 @@ const runLoopTest = async (switcheo, accounts, config, runnerConfig = {}) => {
   await runRaceLoop(switcheo, accounts, config, runnerConfig)
   await clearOpenOrdersForAccounts(switcheo, accounts)
   await runRandomLoop(switcheo, accounts, config, runnerConfig)
+  await clearOpenOrdersForAccounts(switcheo, accounts)
 }
 
 export default runLoopTest

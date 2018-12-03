@@ -164,14 +164,13 @@ const runRandomLoop = (() => {
 
           const createOrderOptions = { num: 1 };
           const createOrdersBuy = (0, _lodash.cloneDeep)(orders.create.buyParams);
-          const sellQuantity = new _bignumber.BigNumber(randomQuantity).times(randomPrice).toFixed(2, _bignumber.BigNumber.ROUND_DOWN);
 
           createOrdersBuy[0].price = randomPrice;
           createOrdersBuy[0].quantity = randomQuantity;
 
           const createOrdersSell = (0, _lodash.cloneDeep)(orders.create.sellParams);
           createOrdersSell[0].price = randomPrice;
-          createOrdersSell[0].quantity = sellQuantity;
+          createOrdersSell[0].quantity = randomQuantity;
 
           const promise = new Promise(function (resolve) {
             const orderParams = createOrderParams(randomAction, flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions);
@@ -265,6 +264,7 @@ const runLoopTest = (() => {
     yield runRaceLoop(switcheo, accounts, config, runnerConfig);
     yield clearOpenOrdersForAccounts(switcheo, accounts);
     yield runRandomLoop(switcheo, accounts, config, runnerConfig);
+    yield clearOpenOrdersForAccounts(switcheo, accounts);
   });
 
   return function runLoopTest(_x9, _x10, _x11) {

@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _switcheoJs = require('switcheo-js');
 
-var _switcheoJs2 = _interopRequireDefault(_switcheoJs);
-
 var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
@@ -47,16 +45,13 @@ const getConfig = env => env.LOCAL ? require('./.config.local') : require('./con
 
 const initialise = (env, { minAccounts = 1 }) => {
   const { wallets } = getConfig(env);
-  const switcheo = new _switcheoJs2.default({
+  const switcheo = new _switcheoJs.Client({
     net: 'TestNet'
   });
 
   checkPrivateKeys(env, wallets);
   checkWalletLength(wallets, minAccounts);
-  const accounts = wallets.map(wallet => _switcheoJs2.default.createAccount({
-    privateKey: env[wallet],
-    blockchain: 'neo'
-  }));
+  const accounts = wallets.map(wallet => new _switcheoJs.Account({ blockchain: 'neo', provider: new _switcheoJs.NeoPrivateKeyProvider(env[wallet]) }));
 
   return [switcheo, accounts];
 };

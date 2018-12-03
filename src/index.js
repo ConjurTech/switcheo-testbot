@@ -1,4 +1,4 @@
-import Switcheo from 'switcheo-js'
+import { Account, Client, NeoPrivateKeyProvider } from 'switcheo-js'
 import bluebird from 'bluebird'
 import { some } from 'lodash'
 import runSingleTest from './runSingleTest'
@@ -22,17 +22,14 @@ const getConfig = (env) => (env.LOCAL ? require('./.config.local') : require('./
 
 const initialise = (env, { minAccounts = 1 }) => {
   const { wallets } = getConfig(env)
-  const switcheo = new Switcheo({
+  const switcheo = new Client({
     net: 'TestNet',
   })
 
   checkPrivateKeys(env, wallets)
   checkWalletLength(wallets, minAccounts)
   const accounts = wallets.map(wallet =>
-    Switcheo.createAccount({
-      privateKey: env[wallet],
-      blockchain: 'neo',
-    })
+    new Account({ blockchain: 'neo', provider: new NeoPrivateKeyProvider(env[wallet]) })
   )
 
   return [switcheo, accounts]

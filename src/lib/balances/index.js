@@ -1,4 +1,4 @@
 const list = async ({ switcheo, account }) =>
-  switcheo.listBalances(account)
+  switcheo.getBalances(account)
 
 export { list }

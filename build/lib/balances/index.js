@@ -8,7 +8,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const list = (() => {
   var _ref = _asyncToGenerator(function* ({ switcheo, account }) {
-    return switcheo.listBalances(account);
+    return switcheo.getBalances(account);
   });
 
   return function list(_x) {

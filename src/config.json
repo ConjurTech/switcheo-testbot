@@ -13,19 +13,18 @@
           }
         },
         {
-          "run": false,
+          "run": true,
           "type": "orders",
           "action": "create",
           "params": [
             {
               "blockchain": "neo",
-              "pair": "SWTH_NEO",
+              "pair": "NRVEP_NEO",
               "side": "buy",
-              "price": 0.00070008,
-              "wantAmount": 14.42692264,
+              "price": 0.000781,
               "useNativeTokens": true,
               "orderType": "limit",
-              "offerAmount": 0.01010000
+              "quantity": 90.01
             }
           ],
           "options": {
@@ -34,7 +33,7 @@
           }
         },
         {
-          "run": false,
+          "run": true,
           "type": "orders",
           "action": "cancelAllOpen"
         }
@@ -49,31 +48,29 @@
         "orders": {
           "create": {
             "num": 5,
-            "priceSteps": 0.00000001,
-            "priceRange": 0.00001000,
-            "amountRange": 0.01,
+            "priceSteps": 0.000001,
+            "priceRange": 0.000010,
+            "amountRange": 10,
             "buyParams": [
               {
                 "blockchain": "neo",
-                "pair": "SWTH_NEO",
+                "pair": "NRVEP_NEO",
                 "side": "buy",
-                "price": 0.00070008,
-                "wantAmount": 28.85384527,
+                "price": 0.000742,
                 "useNativeTokens": true,
                 "orderType": "limit",
-                "offerAmount": 0.02020000
+                "quantity": 500
               }
             ],
             "sellParams": [
               {
                 "blockchain": "neo",
-                "pair": "SWTH_NEO",
+                "pair": "NRVEP_NEO",
                 "side": "sell",
-                "price": 0.00070008,
-                "wantAmount": 0.02020000,
+                "price": 0.000742,
                 "useNativeTokens": true,
                 "orderType": "limit",
-                "offerAmount": 28.85384527
+                "quantity": 200
               }
             ]
           }

@@ -5,11 +5,9 @@ export const printCreatedOrders = (orders) => orders.forEach(o => linePrint(`ord
 
 export const sortOrdersByCreatedAt = (orders) => orderBy(orders, o => new Date(o.createdAt), 'desc')
 
-// switcheo.saveOrder() has to be defered
 export const deferredCreate = (switcheo, account, orderParams) => new Promise((resolve, reject) => {
   try {
-    const order = switcheo.saveOrder(orderParams, account)
-
+    const order = switcheo.makeOrder(orderParams, account)
     resolve(order)
   } catch (err) {
     reject(err)

@@ -29,7 +29,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const list = (() => {
   var _ref = _asyncToGenerator(function* ({ switcheo, account }) {
-    const orders = yield switcheo.listOrders({ pair: 'SWTH_NEO' }, account);
+    const orders = yield switcheo.getOrders({ pair: 'NRVEP_NEO' }, account);
     return (0, _helper.sortOrdersByCreatedAt)(orders);
   });
 
@@ -38,28 +38,19 @@ const list = (() => {
   };
 })();
 
-const makeCreateParams = (_params, priceSteps) => {
-  let params;
-  let price = new _bignumber.BigNumber(_params.price);
-
-  if (_params.side === 'buy') {
+const makeCreateParams = (params, priceSteps) => {
+  if (params.side === 'buy') {
     // buy cheap first, then increase buy price in steps
-    price = price.plus(priceSteps).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
-    const offerAmount = new _bignumber.BigNumber(_params.offerAmount);
-    const wantAmount = offerAmount.div(price).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
-
-    params = _extends({}, _params, { price, wantAmount });
-  } else {
+    const price = new _bignumber.BigNumber(params.price).plus(priceSteps).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+    const quantity = (0, _utils.formatPrecision)(params.quantity);
+    return _extends({}, params, { price, quantity });
+  } else if (params.side === 'sell') {
     // sell expensive first, then decrease buy price in steps
-    price = price.minus(priceSteps).dp(8, _bignumber.BigNumber.ROUND_DOWN).toNumber();
-    const wantAmount = new _bignumber.BigNumber(_params.wantAmount); // TODO: remove this
-
-    params = _extends({}, _params, { price, wantAmount });
+    const price = new _bignumber.BigNumber(params.price).minus(priceSteps).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+    const quantity = (0, _utils.formatPrecision)(params.quantity);
+    return _extends({}, params, { price, quantity });
   }
-
-  delete params.offerAmount;
-
-  return params;
+  throw new Error('Invalid side!');
 };
 
 const create = (() => {

@@ -41,7 +41,7 @@ Sample configs:
           "action": "create",
           "params": [
             {
-              "pair": "SWTH_NEO",
+              "pair": "NRVEP_NEO",
               "blockchain": "neo",
               "side": "buy",
               "price": 0.00060008,

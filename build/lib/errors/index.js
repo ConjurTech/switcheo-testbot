@@ -13,16 +13,6 @@ const isInvalidSignatureError = exports.isInvalidSignatureError = err => {
   return false;
 };
 
-const isBidPriceInvalidError = exports.isBidPriceInvalidError = err => {
-  const bidPriceInvalidMessage = 'Bid price must be lower than your open asks';
-
-  if (err.message.includes(bidPriceInvalidMessage)) {
-    console.warn('BID_PRICE_INVALID_ERROR');
-    return true;
-  }
-  return false;
-};
-
 const isOrderTakenError = exports.isOrderTakenError = err => {
   const orderTakenMessage = 'One or more offers to be filled has already been taken.';
 
@@ -38,6 +28,17 @@ const isOrderFilledOrCancelledError = exports.isOrderFilledOrCancelledError = er
 
   if (err.message.includes(orderFilledOrCancelledMessage)) {
     console.warn('ORDER_FILLED_OR_CANCELLED_ERROR');
+    return true;
+  }
+  return false;
+};
+
+const isOrderSpreadInvalidError = exports.isOrderSpreadInvalidError = err => {
+  const bidPriceInvalidMessage = 'Bid price must be lower than your open asks';
+  const askPriceInvalidMessage = 'Ask price must be higher than your open bids';
+
+  if (err.message.includes(bidPriceInvalidMessage) || err.message.includes(askPriceInvalidMessage)) {
+    console.warn('BID_PRICE_INVALID_ERROR');
     return true;
   }
   return false;

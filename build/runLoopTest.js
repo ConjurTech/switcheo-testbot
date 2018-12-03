@@ -28,8 +28,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-const { isInvalidSignatureError, isBidPriceInvalidError,
-  isOrderTakenError, isOrderFilledOrCancelledError } = act.errors;
+const { isOrderTakenError, isOrderSpreadInvalidError, isOrderFilledOrCancelledError } = act.errors;
 
 const seed = Math.floor(Math.random() * 10000);
 const chance = new _chance2.default(seed);
@@ -82,10 +81,6 @@ const clearOpenOrdersForAccounts = (() => {
         yield cancelAllOpenOrders({ switcheo, account });
       }
     } catch (err) {
-      if (isInvalidSignatureError(err)) {
-        yield (0, _utils.sleep)(500); // courtesy wait
-        yield clearOpenOrdersForAccounts(switcheo, accounts);
-      }
       throw new Error(err);
     }
   });
@@ -164,22 +159,19 @@ const runRandomLoop = (() => {
 
       try {
         if (randomAction === 'buy' || randomAction === 'sell') {
-          const randomPrice = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].price, orders.create.priceRange));
-          const randomOfferAmount = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].offerAmount, orders.create.amountRange));
+          const randomPrice = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].price, orders.create.priceRange)).toFixed(6, _bignumber.BigNumber.ROUND_DOWN);
+          const randomQuantity = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].quantity, orders.create.amountRange)).toFixed(2, _bignumber.BigNumber.ROUND_DOWN);
 
           const createOrderOptions = { num: 1 };
           const createOrdersBuy = (0, _lodash.cloneDeep)(orders.create.buyParams);
-          const buyWant = randomOfferAmount.div(randomPrice).toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
-          const sellWant = randomOfferAmount.toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
+          const sellQuantity = new _bignumber.BigNumber(randomQuantity).times(randomPrice).toFixed(2, _bignumber.BigNumber.ROUND_DOWN);
 
-          createOrdersBuy[0].price = randomPrice.toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
-          createOrdersBuy[0].wantAmount = buyWant;
-          createOrdersBuy[0].offerAmount = sellWant;
+          createOrdersBuy[0].price = randomPrice;
+          createOrdersBuy[0].quantity = randomQuantity;
 
           const createOrdersSell = (0, _lodash.cloneDeep)(orders.create.sellParams);
-          createOrdersSell[0].price = randomPrice.toFixed(8, _bignumber.BigNumber.ROUND_DOWN);
-          createOrdersSell[0].wantAmount = sellWant;
-          createOrdersSell[0].offerAmount = buyWant;
+          createOrdersSell[0].price = randomPrice;
+          createOrdersSell[0].quantity = sellQuantity;
 
           const promise = new Promise(function (resolve) {
             const orderParams = createOrderParams(randomAction, flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions);
@@ -208,15 +200,7 @@ const runRandomLoop = (() => {
           promises.push(promise);
         } // Other random actions will be added to this if else
       } catch (err) {
-        // ocassionally, verify_sig function from switcheo-api fails, we just continue
-        if (isInvalidSignatureError(err)) {
-          // continue without throwing error
-        } else if (isBidPriceInvalidError(err)) {
-          // continue without throwing error
-        } else {
-          console.error('Run Random Loop Error');
-          throw new Error(err);
-        }
+        throw new Error(err);
       }
     }
 
@@ -252,25 +236,14 @@ const runRaceLoop = (() => {
       res = yield createOrder({ switcheo, account: accounts[1] }, ...createOrderParams('sell', flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions), createOrderOptions);
       printOrders(accounts[1], res); // ideally, this account will always do fills
     } catch (err) {
-      // ocassionally, verify_sig function from switcheo-api fails, so we try to run again
-      if (isInvalidSignatureError(err)) {
-        yield (0, _utils.sleep)(500); // courtesy wait
-        yield runRaceLoop(switcheo, accounts, config, _extends({}, runnerConfig, {
-          flipCreateParams // don't flip, retry with same args again
-        }));
-        return;
-      } else if (isOrderTakenError(err)) {
-        // continue without throwing error
-      } else if (isOrderFilledOrCancelledError(err)) {
-        // continue without throwing error
+      if (isOrderTakenError(err) || isOrderFilledOrCancelledError(err) || isOrderSpreadInvalidError(err)) {
+        // continue without throwing for known race errors that can occur,
+        // as we are simply spamming trades and checking balance at the end.
+        console.info('Known race error occured.');
       } else {
-        console.error('Run Race Loop Error');
         throw new Error(err);
       }
     }
-
-    // get rid of dust makes
-    yield clearOpenOrdersForAccounts(switcheo, accounts);
 
     // sleep and loop
     yield (0, _utils.sleep)(interval);
@@ -289,11 +262,9 @@ const runRaceLoop = (() => {
 const runLoopTest = (() => {
   var _ref8 = _asyncToGenerator(function* (switcheo, accounts, config, runnerConfig = {}) {
     yield clearOpenOrdersForAccounts(switcheo, accounts);
-
     yield runRaceLoop(switcheo, accounts, config, runnerConfig);
-    yield runRandomLoop(switcheo, accounts, config, runnerConfig);
-
     yield clearOpenOrdersForAccounts(switcheo, accounts);
+    yield runRandomLoop(switcheo, accounts, config, runnerConfig);
   });
 
   return function runLoopTest(_x9, _x10, _x11) {

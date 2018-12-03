@@ -1,11 +1,10 @@
 import { BigNumber } from 'bignumber.js'
 
-const NEO_ASSET_PRECISION = 8
+const ASSET_PRECISION = 8
 
-export const toNeoAssetAmount = (value) => {
-  const bigNumber = new BigNumber(value)
-  return bigNumber.times(10 ** NEO_ASSET_PRECISION).dp(0).toNumber()
-}
+export const formatPrecision = (value) => (
+  new BigNumber(value).times(10 ** ASSET_PRECISION).toFixed(0, BigNumber.ROUND_DOWN)
+)
 
 export const actPrinter = (type, action, options, res) => {
   console.info(`---------------- Type: ${type} ----------------`)

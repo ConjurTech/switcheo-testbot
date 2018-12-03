@@ -24,7 +24,7 @@
     "elliptic": "^6.4.0",
     "json-stable-stringify": "^1.0.1",
     "lodash": "^4.17.10",
-    "switcheo-js": "git+https://github.com/ConjurTech/switcheo-js-dev.git#7865a74cf484c18aae1abdb7d1fbbb73100eefc4",
+    "switcheo-js": "git+https://github.com/ConjurTech/switcheo-js-dev.git#8e020c8",
     "unirest": "^0.5.1"
   },
   "devDependencies": {

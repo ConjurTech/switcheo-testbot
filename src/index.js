@@ -1,3 +1,5 @@
+import './shim'
+
 import { Account, Client, NeoPrivateKeyProvider } from 'switcheo-js'
 import bluebird from 'bluebird'
 import { some } from 'lodash'

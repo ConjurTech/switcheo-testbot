@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+require('./shim');
+
 var _switcheoJs = require('switcheo-js');
 
 var _bluebird = require('bluebird');

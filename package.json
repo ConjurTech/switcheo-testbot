@@ -2,11 +2,36 @@
   "name": "switcheo-testbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
+    "build": "npx babel src --out-dir build --copy-files",
+    "prep": "npm link switcheo-js",
+    "start": "node -r babel-register ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@cityofzion/neon-js": "^3.9.2",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "bignumber.js": "^7.2.1",
+    "bluebird": "^3.5.1",
+    "chance": "^1.0.16",
+    "crypto-js": "^3.1.9-1",
+    "dotenv": "^6.0.0",
+    "elliptic": "^6.4.0",
+    "json-stable-stringify": "^1.0.1",
+    "lodash": "^4.17.10",
+    "switcheo-js": "git+https://github.com/ConjurTech/switcheo-js-dev.git#8e020c8",
+    "unirest": "^0.5.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0"
+  }
 }

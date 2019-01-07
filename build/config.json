@@ -1,0 +1,81 @@
+{
+  "wallets": ["WALLET_1", "WALLET_2"],
+  "bot": {
+    "single": {
+      "run": false,
+      "commands": [
+        {
+          "run": true,
+          "type": "orders",
+          "action": "list",
+          "options": {
+            "print": true
+          }
+        },
+        {
+          "run": true,
+          "type": "orders",
+          "action": "create",
+          "params": [
+            {
+              "blockchain": "neo",
+              "pair": "NRVEP_NEO",
+              "side": "buy",
+              "price": 0.000781,
+              "useNativeTokens": true,
+              "orderType": "limit",
+              "quantity": 90.01
+            }
+          ],
+          "options": {
+            "cancelImmediately": false,
+            "num": 2
+          }
+        },
+        {
+          "run": true,
+          "type": "orders",
+          "action": "cancelAllOpen"
+        }
+      ]
+    },
+    "loop": {
+      "run": true,
+      "config": {
+        "interval": 1,
+        "raceLength": 4,
+        "randomLength": 100,
+        "orders": {
+          "create": {
+            "num": 5,
+            "priceSteps": 0.000001,
+            "priceRange": 0.000010,
+            "amountRange": 10,
+            "buyParams": [
+              {
+                "blockchain": "neo",
+                "pair": "NRVEP_NEO",
+                "side": "buy",
+                "price": 0.000742,
+                "useNativeTokens": true,
+                "orderType": "limit",
+                "quantity": 500
+              }
+            ],
+            "sellParams": [
+              {
+                "blockchain": "neo",
+                "pair": "NRVEP_NEO",
+                "side": "sell",
+                "price": 0.000742,
+                "useNativeTokens": true,
+                "orderType": "limit",
+                "quantity": 200
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -5008,9 +5008,9 @@ supports-color@^5.3.0:
   dependencies:
     has-flag "^3.0.0"
 
-"switcheo-js@git+https://github.com/ConjurTech/switcheo-js.git#8e020c8":
+"switcheo-js@git+https://github.com/Switcheo/switcheo-js.git#8e020c8":
   version "1.1.0"
-  resolved "git+https://github.com/ConjurTech/switcheo-js.git#8e020c8868ef9e1a872efd5d5dfaab76084cf2a8"
+  resolved "git+https://github.com/Switcheo/switcheo-js.git#8e020c8868ef9e1a872efd5d5dfaab76084cf2a8"
   dependencies:
     "@cityofzion/neon-core" "^4.0.2"
     "@ledgerhq/hw-app-eth" "4.21.0"

@@ -1,16 +1,16 @@
 ## Getting started
 
 - Create `.env` in project's root.
-- Add `WALLET_1=WIF` in `.env`.
+- Add `WALLET_1=WIF` and `WALLET_2=WIF` in `.env`.
 - Run `yarn start`.
-- Optionally, without .env, you can run with `WALLET_1=WIF yarn start`.
+- Optionally, without .env, you can run with `WALLET_1='WIF' WALLET_2='WIF' yarn start`.
 
 ## Buidling
 - Run `yarn build`, to ensure that node.js could use this package natively. package.json points to build.
 
 ## Bot Config
 
-To run bot locally, add `LOCAL=true` to `.env` and create `src/.config.local.json`.
+To run bot using local config, add `LOCAL=true` to `.env` and create `src/.config.local.json`. Or you can run with `WALLET_1='WIF' WALLET_2='WIF' LOCAL=true yarn start`.
 
 Sample configs:
 
@@ -21,6 +21,7 @@ Sample configs:
 - params: array - Some methods requires params.
 
 ```js
+// below might be outdated, look at .config.local.json
 {
   "wallets": ["WALLET_1"], // WALLET_1 should match env name for WIF
   "bot": {

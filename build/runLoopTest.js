@@ -28,7 +28,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-const { isOrderTakenError, isOrderSpreadInvalidError, isOrderFilledOrCancelledError } = act.errors;
+const { isOrderTakenError, isOrderSpreadInvalidError, isOrderFilledOrCancelledError, isOwnOrderInvalidError } = act.errors;
 
 const seed = Math.floor(Math.random() * 10000);
 const chance = new _chance2.default(seed);
@@ -235,7 +235,7 @@ const runRaceLoop = (() => {
       res = yield createOrder({ switcheo, account: accounts[1] }, ...createOrderParams('sell', flipCreateParams, createOrdersBuy, createOrdersSell, createOrderOptions), createOrderOptions);
       printOrders(accounts[1], res); // ideally, this account will always do fills
     } catch (err) {
-      if (isOrderTakenError(err) || isOrderFilledOrCancelledError(err) || isOrderSpreadInvalidError(err)) {
+      if (isOrderTakenError(err) || isOrderFilledOrCancelledError(err) || isOwnOrderInvalidError(err) || isOrderSpreadInvalidError(err)) {
         // continue without throwing for known race errors that can occur,
         // as we are simply spamming trades and checking balance at the end.
         console.info('Known race error occured.');

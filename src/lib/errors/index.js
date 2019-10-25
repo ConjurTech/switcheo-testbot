@@ -39,3 +39,13 @@ export const isOrderSpreadInvalidError = (err) => {
   }
   return false
 }
+
+export const isOwnOrderInvalidError = (err) => {
+  const ownOrderInvalidMessage = 'Your order is no longer valid as a better price is now available.'
+
+  if (err.message.includes(ownOrderInvalidMessage)) {
+    console.warn('OWN_ORDER_PRICE_SPREAD_INVALID')
+    return true
+  }
+  return false
+}

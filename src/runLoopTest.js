@@ -5,7 +5,7 @@ import { sleep, linePrint } from './utils'
 import * as act from './lib'
 import { filterOpenOrders } from './lib/orders/filters'
 
-const { isOrderTakenError, isOrderSpreadInvalidError, isOrderFilledOrCancelledError } = act.errors
+const { isOrderTakenError, isOrderSpreadInvalidError, isOrderFilledOrCancelledError, isOwnOrderInvalidError } = act.errors
 
 const seed = Math.floor(Math.random() * 10000)
 const chance = new Chance(seed)
@@ -176,6 +176,7 @@ const runRaceLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
   } catch (err) {
     if (isOrderTakenError(err)
       || isOrderFilledOrCancelledError(err)
+      || isOwnOrderInvalidError(err)
       || isOrderSpreadInvalidError(err)) {
       // continue without throwing for known race errors that can occur,
       // as we are simply spamming trades and checking balance at the end.

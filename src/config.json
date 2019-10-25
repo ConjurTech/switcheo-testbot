@@ -21,7 +21,7 @@
               "blockchain": "neo",
               "pair": "NRVEP_NEO",
               "side": "buy",
-              "price": 0.000781,
+              "price": 0.00781,
               "useNativeTokens": true,
               "orderType": "limit",
               "quantity": 90.01
@@ -48,15 +48,15 @@
         "orders": {
           "create": {
             "num": 5,
-            "priceSteps": 0.000001,
-            "priceRange": 0.000010,
+            "priceSteps": 0.00001,
+            "priceRange": 0.00010,
             "amountRange": 10,
             "buyParams": [
               {
                 "blockchain": "neo",
                 "pair": "NRVEP_NEO",
                 "side": "buy",
-                "price": 0.000742,
+                "price": 0.00742,
                 "useNativeTokens": true,
                 "orderType": "limit",
                 "quantity": 500
@@ -67,7 +67,7 @@
                 "blockchain": "neo",
                 "pair": "NRVEP_NEO",
                 "side": "sell",
-                "price": 0.000742,
+                "price": 0.00742,
                 "useNativeTokens": true,
                 "orderType": "limit",
                 "quantity": 200

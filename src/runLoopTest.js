@@ -52,7 +52,7 @@ const createOrderParams = (side, flip, buyParams, sellParams, { num, priceSteps 
   return ((side === 'buy' && !flip) || (side === 'sell' && flip) ? buyParams : sellParams)
 }
 
-const getRandomFloat = (base, range) =>
+const getRandomFloat = (precision, base, range) =>
   chance.floating({ fixed: 8, min: base - range, max: base + range })
 
 const formatRandomLoopRes = (results) =>
@@ -99,11 +99,12 @@ const runRandomLoop = async (switcheo, accounts, config, runnerConfig = {}) => {
 
     try {
       if (randomAction === 'buy' || randomAction === 'sell') {
+        const precision = (orders.create.priceRange).toString().replace('0.', '').length
         const randomPrice = new BigNumber(
-          getRandomFloat(orders.create.buyParams[0].price, orders.create.priceRange)
-        ).toFixed(6, BigNumber.ROUND_DOWN)
+          getRandomFloat(precision, orders.create.buyParams[0].price, orders.create.priceRange)
+        ).toFixed(precision, BigNumber.ROUND_DOWN)
         const randomQuantity = new BigNumber(
-          getRandomFloat(orders.create.buyParams[0].quantity, orders.create.amountRange)
+          getRandomFloat(precision, orders.create.buyParams[0].quantity, orders.create.amountRange)
         ).toFixed(2, BigNumber.ROUND_DOWN)
 
         const createOrderOptions = { num: 1 }

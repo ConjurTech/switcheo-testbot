@@ -113,7 +113,7 @@ const createOrderParams = (side, flip, buyParams, sellParams, { num, priceSteps 
   return side === 'buy' && !flip || side === 'sell' && flip ? buyParams : sellParams;
 };
 
-const getRandomFloat = (base, range) => chance.floating({ fixed: 8, min: base - range, max: base + range });
+const getRandomFloat = (precision, base, range) => chance.floating({ fixed: 8, min: base - range, max: base + range });
 
 const formatRandomLoopRes = results => results.map(result => {
   const [action, params, res] = result;
@@ -159,8 +159,9 @@ const runRandomLoop = (() => {
 
       try {
         if (randomAction === 'buy' || randomAction === 'sell') {
-          const randomPrice = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].price, orders.create.priceRange)).toFixed(6, _bignumber.BigNumber.ROUND_DOWN);
-          const randomQuantity = new _bignumber.BigNumber(getRandomFloat(orders.create.buyParams[0].quantity, orders.create.amountRange)).toFixed(2, _bignumber.BigNumber.ROUND_DOWN);
+          const precision = orders.create.priceRange.toString().replace('0.', '').length;
+          const randomPrice = new _bignumber.BigNumber(getRandomFloat(precision, orders.create.buyParams[0].price, orders.create.priceRange)).toFixed(precision, _bignumber.BigNumber.ROUND_DOWN);
+          const randomQuantity = new _bignumber.BigNumber(getRandomFloat(precision, orders.create.buyParams[0].quantity, orders.create.amountRange)).toFixed(2, _bignumber.BigNumber.ROUND_DOWN);
 
           const createOrderOptions = { num: 1 };
           const createOrdersBuy = (0, _lodash.cloneDeep)(orders.create.buyParams);

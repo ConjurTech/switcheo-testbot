@@ -23,7 +23,7 @@
     "dotenv": "^6.0.0",
     "elliptic": "^6.4.0",
     "json-stable-stringify": "^1.0.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.19",
     "switcheo-js": "1.1.67",
     "unirest": "^0.5.1"
   },
